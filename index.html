@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Library</title>
+</head>
+<body>
+	<button id="newBookButton">New Book</button>
+	<form id="newBookForm" style="display: none;">
+		<p>Add a new book below</p>
+
+		<div>
+			<label for="title">Title</label>
+			<input type="text" id="title">
+		</div>
+
+		<div>
+			<label for="author">Author</label>
+			<input type="text" id="author">
+		</div>
+
+		<div>
+			<label for="pages">Pages</label>
+			<input type="number" id="pages">
+		</div>
+
+		<div>
+			<label for="read">
+				<input type="checkbox" id="read">Read
+			</label>
+		</div>
+
+		<button id="addBook">Add book</button>
+	</form>
+	<table class="books">
+		<tr>
+			<th>Title</th>
+			<th>Author</th>
+			<th>Pages</th>
+			<th>Read</th>
+		</tr>
+	</div>
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-firestore.js"></script>
+	<script>	
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyAAqPFOwfY4D1izDlIwndBMEe79Gagn2h0",
+	    authDomain: "library-e253e.firebaseapp.com",
+	    databaseURL: "https://library-e253e.firebaseio.com",
+	    projectId: "library-e253e",
+	    storageBucket: "library-e253e.appspot.com",
+	    messagingSenderId: "143692886357"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+	<script>
+		let	library = [],
+			table = document.querySelector('.books'),
+			newBookButton = document.getElementById('newBookButton'),
+			newBookForm = document.getElementById('newBookForm'),
+			addBook = document.getElementById('addBook');
+
+		if (!localStorage.library) {
+			localStorage.setItem('library', JSON.stringify(library));
+		} else {
+			JSON.parse(localStorage.getItem('library')).forEach(book => {
+				book.__proto__ = Object.create(Book.prototype);
+				library.push(book);
+			});
+		}
+
+		function updateLocalStorage() {
+			localStorage.setItem('library', JSON.stringify(library));
+		}
+
+		function loadLocalStorage() {
+			library.forEach(book => render(book));
+		}
+		
+
+		function Book(title, author, pages, read) {
+			this.title = title;
+			this.author = author;
+			this.pages = pages;
+			this.read = read;
+		}
+
+		Book.prototype.toggleRead = function () {
+			this.read = !this.read;
+		}
+
+		function addBookToLibrary(book) {
+			library.push(book);
+			updateLocalStorage();
+		}
+
+		function render(newBook) {
+			table.innerHTML += `
+			<tr data-book="${library.indexOf(newBook)}">
+				<td>${newBook.title}</td>
+				<td>${newBook.author}</td>
+				<td>${newBook.pages}</td>
+				<td>${newBook.read ? 'Yes' : 'No'}</td>
+				<td><button class="toggleRead">${newBook.read ? 'Unread' : 'Read'}</button></td>
+				<td><button class="deleteBook">X</button></td>
+			</tr>
+			`;
+		}
+
+		newBookButton.addEventListener('click', () => newBookForm.style.display = 'block');
+
+		addBook.addEventListener('click', e =>	{
+			e.preventDefault();
+
+			newBookForm.style.display = 'none';
+
+			newBook = new Book(
+				document.getElementById('title').value,
+				document.getElementById('author').value,
+				document.getElementById('pages').value,
+				document.getElementById('read').checked
+			);
+
+			addBookToLibrary(newBook);
+
+			render(newBook);
+		});
+
+		document.addEventListener('click', e => {
+			changeButton = e.target;
+
+			if (changeButton.classList.contains('deleteBook')) {
+				library[changeButton.parentElement.dataset.book] = null;
+				changeButton.parentElement.parentElement.parentElement.removeChild(changeButton.parentElement.parentElement);
+				updateLocalStorage();
+			}
+
+			if (changeButton.classList.contains('toggleRead')) {
+				currentBook = library[changeButton.parentElement.parentElement.dataset.book];
+
+				currentBook.toggleRead();
+				changeButton.parentElement.previousElementSibling.textContent = currentBook.read ? 'Yes' : 'No';
+				changeButton.textContent = changeButton.textContent === 'Read' ? 'Unread' : 'Read';
+				updateLocalStorage();
+			}
+		});
+
+		loadLocalStorage();
+	</script>
+</body>
+</html>
