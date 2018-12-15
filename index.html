@@ -40,21 +40,21 @@
 			<th>Read</th>
 		</tr>
 	</div>
-	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-firestore.js"></script>
-	<script>	
-	  // Initialize Firebase
-	  var config = {
-	    apiKey: "AIzaSyAAqPFOwfY4D1izDlIwndBMEe79Gagn2h0",
-	    authDomain: "library-e253e.firebaseapp.com",
-	    databaseURL: "https://library-e253e.firebaseio.com",
-	    projectId: "library-e253e",
-	    storageBucket: "library-e253e.appspot.com",
-	    messagingSenderId: "143692886357"
-	  };
-	  firebase.initializeApp(config);
-	</script>
 	<script>
+		class Book {
+
+			constructor (title, author, pages, read) {
+				this.title = title;
+				this.author = author;
+				this.pages = pages;
+				this.read = read;
+			}
+
+			toggleRead () {
+				this.read = !this.read;
+			}
+		}
+
 		let	library = [],
 			table = document.querySelector('.books'),
 			newBookButton = document.getElementById('newBookButton'),
@@ -77,18 +77,6 @@
 		function loadLocalStorage() {
 			library.forEach(book => render(book));
 		}
-		
-
-		function Book(title, author, pages, read) {
-			this.title = title;
-			this.author = author;
-			this.pages = pages;
-			this.read = read;
-		}
-
-		Book.prototype.toggleRead = function () {
-			this.read = !this.read;
-		}
 
 		function addBookToLibrary(book) {
 			library.push(book);
@@ -97,14 +85,14 @@
 
 		function render(newBook) {
 			table.innerHTML += `
-			<tr data-book="${library.indexOf(newBook)}">
-				<td>${newBook.title}</td>
-				<td>${newBook.author}</td>
-				<td>${newBook.pages}</td>
-				<td>${newBook.read ? 'Yes' : 'No'}</td>
-				<td><button class="toggleRead">${newBook.read ? 'Unread' : 'Read'}</button></td>
-				<td><button class="deleteBook">X</button></td>
-			</tr>
+				<tr data-book="${library.indexOf(newBook)}">
+					<td>${newBook.title}</td>
+					<td>${newBook.author}</td>
+					<td>${newBook.pages}</td>
+					<td>${newBook.read ? 'Yes' : 'No'}</td>
+					<td><button class="toggleRead">${newBook.read ? 'Unread' : 'Read'}</button></td>
+					<td><button class="deleteBook">X</button></td>
+				</tr>
 			`;
 		}
 
