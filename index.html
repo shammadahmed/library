@@ -26,7 +26,7 @@
 
 		<div>
 			<label for="read">
-				<input type="checkbox" id="read" required>Read
+				<input type="checkbox" id="read">Read
 			</label>
 		</div>
 
@@ -96,10 +96,13 @@
 			`;
 		}
 
+
 		newBookButton.addEventListener('click', () => newBookForm.style.display = 'block');
 
 		addBook.addEventListener('click', e =>	{
 			// e.preventDefault();
+
+			if (!newBookForm.checkValidity()) return; 
 
 			newBookForm.style.display = 'none';
 
